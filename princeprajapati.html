@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe Pro</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* SIDE CREDIT */
+.side-credit {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* TOP CREDIT */
+.top-credit {
+  font-size: 14px;
+  color: gray;
+  margin-bottom: 5px;
+}
+
+.container {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.cell {
+  width: 80px;
+  height: 80px;
+  background: #f0f0f0;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  width: 85%;
+  cursor: pointer;
+}
+
+.start-btn { background: #667eea; color: white; }
+.back-btn { background: #ffa500; color: white; }
+.restart-btn { background: #ff5e5e; color: white; }
+
+#status {
+  margin-top: 10px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDE CREDIT -->
+<div class="side-credit">🎮 Tic Tac Toe Game - Created by Prince Prajapati</div>
+
+<!-- START SCREEN -->
+<div class="container" id="startScreen">
+  <div class="top-credit">Created by Prince Prajapati</div>
+
+  <h2>🎮 Tic Tac Toe</h2>
+  <p>Kis ke saath khelna hai?</p>
+
+  <button class="start-btn" onclick="startGame('pvp')">👥 Bhai ke saath</button>
+  <button class="start-btn" onclick="startGame('ai')">🤖 Computer ke saath</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="container" id="gameScreen" style="display:none;">
+  <div class="top-credit">🎮 Tic Tac Toe - Created by Prince Prajapati</div>
+
+  <h2>❌⭕ Game</h2>
+
+  <div class="board">
+    <div class="cell" onclick="play(0)"></div>
+    <div class="cell" onclick="play(1)"></div>
+    <div class="cell" onclick="play(2)"></div>
+    <div class="cell" onclick="play(3)"></div>
+    <div class="cell" onclick="play(4)"></div>
+    <div class="cell" onclick="play(5)"></div>
+    <div class="cell" onclick="play(6)"></div>
+    <div class="cell" onclick="play(7)"></div>
+    <div class="cell" onclick="play(8)"></div>
+  </div>
+
+  <div id="status">Player ❌ turn</div>
+
+  <button class="restart-btn" onclick="restart()">Restart</button>
+  <button class="back-btn" onclick="goBack()">⬅ Back to Menu</button>
+</div>
+
+<script>
+let board = ["","","","","","","","",""];
+let current = "❌";
+let gameOver = false;
+let mode = "";
+
+function startGame(selectedMode) {
+  mode = selectedMode;
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+  restart();
+}
+
+function play(index) {
+  if (board[index] !== "" || gameOver) return;
+
+  board[index] = current;
+  updateBoard();
+
+  if (checkWin(current)) {
+    document.getElementById("status").innerText = current + " Wins 🎉";
+    gameOver = true;
+    return;
+  }
+
+  if (!board.includes("")) {
+    document.getElementById("status").innerText = "Draw 😐";
+    gameOver = true;
+    return;
+  }
+
+  if (mode === "pvp") {
+    current = current === "❌" ? "⭕" : "❌";
+    document.getElementById("status").innerText = "Player " + current + " turn";
+  } else {
+    current = "⭕";
+    document.getElementById("status").innerText = "Computer Turn 🤖";
+    setTimeout(computerMove, 500);
+  }
+}
+
+function computerMove() {
+  let empty = board.map((v,i)=> v==""?i:null).filter(v=>v!==null);
+  let move = empty[Math.floor(Math.random() * empty.length)];
+
+  board[move] = "⭕";
+  updateBoard();
+
+  if (checkWin("⭕")) {
+    document.getElementById("status").innerText = "Computer Wins 🤖";
+    gameOver = true;
+    return;
+  }
+
+  if (!board.includes("")) {
+    document.getElementById("status").innerText = "Draw 😐";
+    gameOver = true;
+    return;
+  }
+
+  current = "❌";
+  document.getElementById("status").innerText = "Your Turn";
+}
+
+function updateBoard() {
+  document.querySelectorAll(".cell").forEach((cell,i)=>{
+    cell.innerText = board[i];
+  });
+}
+
+function checkWin(player) {
+  let wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  return wins.some(comb => comb.every(i => board[i] === player));
+}
+
+function restart() {
+  board = ["","","","","","","","",""];
+  current = "❌";
+  gameOver = false;
+  document.getElementById("status").innerText = "Player ❌ turn";
+  updateBoard();
+}
+
+function goBack() {
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("startScreen").style.display = "block";
+}
+</script>
+
+</body>
+</html>
